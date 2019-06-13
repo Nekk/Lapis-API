@@ -90,11 +90,14 @@
 // }
 
 const { ApolloServer } = require('apollo-server-express')
+const { buildSchema } = require('graphql');
 const { gql } = require('apollo-server');
 const express = require('express')
+const graphqlHTTP = require('express-graphql');
 const cors = require('cors')
 
 const books = require('../model/books').books
+const User = require('../model/User').User
 
 // This is a (sample) collection of books we'll be able to query
 // the GraphQL server for.  A more complete example might fetch
@@ -103,6 +106,7 @@ const books = require('../model/books').books
 
 // Type definitions define the "shape" of your data and specify
 // which ways the data can be fetched from the GraphQL server.
+
 const typeDefs = gql`
   # Comments in GraphQL are defined with the hash (#) symbol.
 
@@ -121,11 +125,62 @@ const typeDefs = gql`
 
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
+var fakeDatabase = {}
+
+const schema = buildSchema(`
+input UserInput {
+  username: String
+  password: String
+}
+
+type User {
+  id: ID!
+  username: String
+  password: String
+  email: String
+}
+
+type Query {
+  getUser(id: ID!): User
+}
+
+type Mutation {
+  createUser(input: UserInput): User
+  updateUser(id: ID!, input: UserInput): User
+}
+`);
+
 const resolvers = {
-  Query: {
-    books: () => books,
-  },
+  // Query: {
+  //   books: () => books,
+  // }
 };
+
+const root = {
+  createUser: function({input}) {
+    console.log(input)
+    var id = require('crypto').randomBytes(10).toString('hex');
+    fakeDatabase[id] = input
+    return new User(id, input)
+  },
+  getUser: function({id}){
+    if (!fakeDatabase[id]) {
+      throw new Error('no user exists with id ' + id);
+    }
+    return new User(id, fakeDatabase[id]);
+  },
+  updateUser: ({id, input}) => {
+    if (!fakeDatabase[id]) {
+      throw new Error('no user exists with id ' + id);
+    }
+    fakeDatabase[id] = input
+    return new User(id,fakeDatabase[id])
+  }
+}
+
+loggingMiddleware = (req, res, next) => {
+  console.log()
+}
 
 const app = express()
 
@@ -133,8 +188,18 @@ app.use(cors())
 // In the most basic sense, the ApolloServer can be started
 // by passing type definitions (typeDefs) and the resolvers
 // responsible for fetching the data for those types.
+
+app.use('/graphql',graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql : true
+}))
+
+app.use(loggingMiddleware)
+
 const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({app});
+// server.applyMiddleware({app});
+
 // This `listen` method launches a web-server.  Existing apps
 // can utilize middleware options, which we'll discuss later.
 
