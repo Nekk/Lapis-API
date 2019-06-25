@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt')
+const saltRounds = 10
+
 export default {
   // User:{
   //     terminal: (parent, args, context, info) => parent.getTerminal()
@@ -10,11 +13,32 @@ export default {
       user: (parent, { id }, { db }, info) => db.models.User.findById(id)
   },
   Mutation: {
+      loginUser: async (parent, {username, password}, { db }, info) => {
+        const condition = {username}
+
+        const findUser = await db.models.User.findOne({
+          raw: true,
+          where: condition
+        })
+
+        if(findUser){
+          const result = await bcrypt.compare(password, findUser.password)
+          .then(res => {
+            return res
+          })
+          return result
+        }
+        return false // can't find the specified user
+      }
+      ,
       registerUser: (parent, { email, username, password }, { db }, info) =>
-        db.models.User.create({
-          email: email,
-          username: username,
-          password: password
+        bcrypt.hash(password, saltRounds)
+        .then( hash => {
+          return db.models.User.create({
+            email: email,
+            username: username,
+            password: hash
+          })
         }),
       updateUser: (parent, { id, username }, { db }, info) =>
         db.models.User.update({
