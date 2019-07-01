@@ -22,11 +22,10 @@ export default {
         })
 
         if(findUser){
-          const result = await bcrypt.compare(password, findUser.password)
+          return await bcrypt.compare(password, findUser.password)
           .then(res => {
             return res
           })
-          return result
         }
         return false // can't find the specified user
       }
