@@ -17,15 +17,23 @@ module.exports = (sequelize, DataTypes) => {
           primaryKey: true,
           autoIncrement: true
         },
-        email: DataTypes.TEXT,
+        email: DataTypes.STRING(20),
         username: {
-            type: DataTypes.TEXT,
+            type: DataTypes.STRING(20),
             allowNull: false
         },
         password: {
           type: DataTypes.TEXT,
           allowNull: false
         },
+        first_name: {
+          type: DataTypes.STRING(45),
+          allowNull: false
+        },
+        last_name:{
+          type: DataTypes.STRING(45),
+          allowNull: false
+        }
       },
       {
         timestamps: false,

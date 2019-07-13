@@ -1,5 +1,14 @@
 const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 const saltRounds = 10
+const tokenSize = 45
+
+const requestToken = (isUserExist) => {
+  if(isUserExist){
+    return crypto.randomBytes(tokenSize).toString('hex')
+  }
+  return null
+}
 
 export default {
   // User:{
@@ -22,14 +31,18 @@ export default {
         })
 
         if(findUser){
-          return await bcrypt.compare(password, findUser.password)
+          let isUserExist = await bcrypt.compare(password, findUser.password)
           .then(res => {
             return res
           })
+          const accessToken = requestToken(isUserExist)
+          
+          return accessToken
         }
-        return false // can't find the specified user
+        return 'safsa' // can't find the specified user
       }
       ,
+
       registerUser: (parent, { email, username, password }, { db }, info) =>
         bcrypt.hash(password, saltRounds)
         .then( hash => {
@@ -45,13 +58,13 @@ export default {
         },
         {
           where: {
-            id: id
+            id
           }
         }),
       deleteUser: (parent, {id}, { db }, info) =>
         db.models.User.destroy({
           where: {
-            id: id
+            id
           }
         })
   }

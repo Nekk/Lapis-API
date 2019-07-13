@@ -85,7 +85,9 @@ const server = new ApolloServer({
   resolvers,
   // context: { db }
   context: ({req}) => {
-    const token = req.headers.authentication
+    const token = req.headers
+    // console.log("token = ")
+    // console.log(token)
     console.log("inside context")
 
     return { db }
