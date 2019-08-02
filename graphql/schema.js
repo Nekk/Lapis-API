@@ -11,7 +11,7 @@ export default `
     }
     type Mutation{
         loginUser(username: String, password: String): String!
-        registerUser(email: String, username: String, password: String): User!
+        registerUser(firstName: String, lastName: String, email: String, username: String, password: String): User!
         updateUser(id: ID!, username: String): [Int!]!
         deleteUser(id: ID!): Int!
     }

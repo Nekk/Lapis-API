@@ -1,13 +1,21 @@
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const saltRounds = 10
-const tokenSize = 45
+const byteSize = 45
 
-const requestToken = (isUserExist) => {
-  if(isUserExist){
-    return crypto.randomBytes(tokenSize).toString('hex')
-  }
-  return null
+const requestToken = (payload) => {
+    // return crypto.randomBytes(tokenSize).toString('hex')
+    const secret = crypto.randomBytes(byteSize).toString('hex')
+    const signOptions = {
+      // issuer: "LAPIS",
+      // subject: "oneforall@lapis.com",
+      // audience: 'http://www.lapis.com',
+      expiresIn: '1h',
+      // algorithm: "RS256"
+    }
+    const token = jwt.sign(payload, secret, signOptions)
+    return token
 }
 
 export default {
@@ -24,31 +32,36 @@ export default {
   Mutation: {
       loginUser: async (parent, {username, password}, { db }, info) => {
         const condition = {username}
-
         const findUser = await db.models.User.findOne({
           raw: true,
           where: condition
         })
 
         if(findUser){
+          let accessToken = "Generate Token Error"; // password doesn't match
           let isUserExist = await bcrypt.compare(password, findUser.password)
           .then(res => {
             return res
           })
-          const accessToken = requestToken(isUserExist)
+          const payload = {
+            username
+          }
           
+          if(isUserExist) accessToken = requestToken(payload)
+          // console.log("here")
+          // console.log(accessToken)
           return accessToken
         }
-        return 'safsa' // can't find the specified user
-      }
-      ,
-
-      registerUser: (parent, { email, username, password }, { db }, info) =>
+        return '' // can't find the specified user
+      },
+      registerUser: (parent, { firstName, lastName, email, username, password }, { db }, info) =>
         bcrypt.hash(password, saltRounds)
         .then( hash => {
           return db.models.User.create({
-            email: email,
-            username: username,
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            username,
             password: hash
           })
         }),
