@@ -26,14 +26,18 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.TEXT,
           allowNull: false
         },
-        first_name: {
+        firstName: {
           type: DataTypes.STRING(45),
           allowNull: false
         },
-        last_name:{
+        lastName:{
           type: DataTypes.STRING(45),
           allowNull: false
-        }
+        },
+        // profilePicture:{
+        //   type: DataTypes.Byte
+        //   allowNull: true
+        // }
       },
       {
         timestamps: false,

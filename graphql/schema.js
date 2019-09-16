@@ -1,18 +1,20 @@
 export default `
     type User{
         id: ID!
+        firstName: String
+        lastName: String
         email: String
         username: String
         password: String
     }
     type Query{
-        user(id: ID!) : User
+        user(username: String!) : User
         users: [User!]!
     }
     type Mutation{
         loginUser(username: String, password: String): String!
         registerUser(firstName: String, lastName: String, email: String, username: String, password: String): User!
-        updateUser(id: ID!, username: String): [Int!]!
+        updateUser(oldUsername: String, firstName: String, lastName: String, email: String, username: String, password: String): [Int!]!
         deleteUser(id: ID!): Int!
     }
 `

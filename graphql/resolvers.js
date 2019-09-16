@@ -1,3 +1,5 @@
+import Expo from 'expo-server-sdk'
+
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
@@ -18,6 +20,13 @@ const requestToken = (payload) => {
     return token
 }
 
+const hashPassword = async (plainPassword) => {
+  const encryptedPassword = await bcrypt.hash(plainPassword, saltRounds).then( hash => {
+    return hash
+  })
+  return encryptedPassword
+}
+
 export default {
   // User:{
   //     terminal: (parent, args, context, info) => parent.getTerminal()
@@ -27,7 +36,7 @@ export default {
   // }
   Query:{
       users: (parent,args, {db}, info) => db.models.User.findAll(),
-      user: (parent, { id }, { db }, info) => db.models.User.findById(id)
+      user: (parent, { username }, { db }, info) => db.models.User.findOne({ where:{ username } }),
   },
   Mutation: {
       loginUser: async (parent, {username, password}, { db }, info) => {
@@ -48,32 +57,51 @@ export default {
           }
           
           if(isUserExist) accessToken = requestToken(payload)
-          // console.log("here")
-          // console.log(accessToken)
           return accessToken
         }
         return '' // can't find the specified user
       },
-      registerUser: (parent, { firstName, lastName, email, username, password }, { db }, info) =>
-        bcrypt.hash(password, saltRounds)
-        .then( hash => {
-          return db.models.User.create({
-            first_name: firstName,
-            last_name: lastName,
+      registerUser: async (parent, { firstName, lastName, email, username, password }, { db }, info) => {
+        const hashedPassword = await hashPassword(password)
+
+        return db.models.User.create({
+          firstName,
+          lastName,
+          email,
+          username,
+          password: hashedPassword
+        })
+      },
+      updateUser: async (parent, { oldUsername, firstName, lastName, email, username, password }, { db }, info) => {
+        
+        const findUserID = await db.models.User.findOne({
+          raw: true,
+          attributes:[
+            'id'
+          ],
+          where:{
+            username : oldUsername
+          }
+        })
+        if(findUserID) {
+          const id = findUserID.id
+          const hashedPassword = await hashPassword(password)
+
+          return await db.models.User.update({
+            firstName,
+            lastName,
             email,
             username,
-            password: hash
+            password : hashedPassword
+          },
+          {
+            where: {
+              id
+            }
           })
-        }),
-      updateUser: (parent, { id, username }, { db }, info) =>
-        db.models.User.update({
-          username: username
-        },
-        {
-          where: {
-            id
-          }
-        }),
+        }
+        return [0] // can't find the user to update
+      },
       deleteUser: (parent, {id}, { db }, info) =>
         db.models.User.destroy({
           where: {
