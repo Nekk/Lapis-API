@@ -37,7 +37,10 @@ export default {
   Query:{
       users: (parent,args, {db}, info) => db.models.User.findAll(),
       user: (parent, { username }, { db }, info) => db.models.User.findOne({ where:{ username } }),
-  },
+      // getPushNotiToken: (parent, { username },{ db }, info) => {
+      //   return "expo token"
+      // }
+    },
   Mutation: {
       loginUser: async (parent, {username, password}, { db }, info) => {
         const condition = {username}
@@ -107,6 +110,11 @@ export default {
           where: {
             id
           }
-        })
+      }),
+      // storePushNotiToken: (parent, { token, username }, { db }, info) => {
+      //   console.log("heree")
+      //   console.log(token, username)
+      //   return true;
+      // }, 
   }
 }
