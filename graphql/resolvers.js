@@ -1,10 +1,12 @@
 import Expo from 'expo-server-sdk'
+// import { expo_push_token } from '../database/constant'
 
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const saltRounds = 10
 const byteSize = 45
+let expo_push_token;
 
 const requestToken = (payload) => {
     // return crypto.randomBytes(tokenSize).toString('hex')
@@ -28,23 +30,23 @@ const hashPassword = async (plainPassword) => {
 }
 
 export default {
-  // User:{
+  // user:{
   //     terminal: (parent, args, context, info) => parent.getTerminal()
   // },
-  // Terminal:{
+  // terminal:{
   //     users: (parent, args, context, info) => parent.getUsers()
   // }
   Query:{
-      users: (parent,args, {db}, info) => db.models.User.findAll(),
-      user: (parent, { username }, { db }, info) => db.models.User.findOne({ where:{ username } }),
-      // getPushNotiToken: (parent, { username },{ db }, info) => {
-      //   return "expo token"
-      // }
+      users: (parent,args, {db}, info) => db.models.user.findAll(),
+      user: (parent, { username }, { db }, info) => db.models.user.findOne({ where:{ username } }),
+      getPushNotiToken: (parent, { username },{ db }, info) => {
+        return expo_push_token
+      }
     },
   Mutation: {
       loginUser: async (parent, {username, password}, { db }, info) => {
         const condition = {username}
-        const findUser = await db.models.User.findOne({
+        const findUser = await db.models.user.findOne({
           raw: true,
           where: condition
         })
@@ -67,7 +69,7 @@ export default {
       registerUser: async (parent, { firstName, lastName, email, username, password }, { db }, info) => {
         const hashedPassword = await hashPassword(password)
 
-        return db.models.User.create({
+        return db.models.user.create({
           firstName,
           lastName,
           email,
@@ -77,7 +79,7 @@ export default {
       },
       updateUser: async (parent, { oldUsername, firstName, lastName, email, username, password }, { db }, info) => {
         
-        const findUserID = await db.models.User.findOne({
+        const findUserID = await db.models.user.findOne({
           raw: true,
           attributes:[
             'id'
@@ -90,7 +92,7 @@ export default {
           const id = findUserID.id
           const hashedPassword = await hashPassword(password)
 
-          return await db.models.User.update({
+          return await db.models.user.update({
             firstName,
             lastName,
             email,
@@ -106,15 +108,16 @@ export default {
         return [0] // can't find the user to update
       },
       deleteUser: (parent, {id}, { db }, info) =>
-        db.models.User.destroy({
+        db.models.user.destroy({
           where: {
             id
           }
       }),
-      // storePushNotiToken: (parent, { token, username }, { db }, info) => {
-      //   console.log("heree")
-      //   console.log(token, username)
-      //   return true;
-      // }, 
+      storePushNotiToken: (parent, { token, username }, { db }, info) => {
+        // console.log(token, username)
+        return db.models.expo_token.create({ 
+          token
+        })
+      }, 
   }
 }

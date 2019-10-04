@@ -30,7 +30,7 @@ server.applyMiddleware({ app })
 db.sequelize.sync().then(() => {
  
   //create a single row
-  // db.models.User.create(
+  // db.models.user.create(
   //   {
   //     email: "email@testtest.com",
   //     username:"testGraphQL2",
@@ -39,7 +39,7 @@ db.sequelize.sync().then(() => {
   // )
 
   //create multiple rows
-  // db.models.User.bulkCreate([
+  // db.models.user.bulkCreate([
   //   { email: "email@testtest.com", username:"testGraphQL2", password:"password1222" },
   //   { email: "email@testtest.com", username:"testGraphQL2", password:"password1222" }
   // ])

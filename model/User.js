@@ -11,7 +11,7 @@
 // }
 
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
+    const user = sequelize.define('user', {
         id: {
           type: DataTypes.INTEGER,
           primaryKey: true,
@@ -49,5 +49,5 @@ module.exports = (sequelize, DataTypes) => {
     //   User.belongsTo(models.terminal);
     // };
   
-    return User;
+    return user;
 }
