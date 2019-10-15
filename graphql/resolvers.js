@@ -39,8 +39,29 @@ export default {
   Query:{
       users: (parent,args, {db}, info) => db.models.user.findAll(),
       user: (parent, { username }, { db }, info) => db.models.user.findOne({ where:{ username } }),
-      getPushNotiToken: (parent, { username },{ db }, info) => {
-        return expo_push_token
+      getUserId:(parent, { username },{ db }, info) => {
+        return db.models.user.findOne({
+          raw: true,
+          attributes: ['id'],
+          where: { username }
+        }).then(res => {
+          return res.id
+        })
+      },
+      getPushNotiToken: (parent, { userId },{ db }, info) => {
+        // console.log(userId)
+        // console.log(typeof userId)
+        
+        return db.models.expo_token.findOne({
+          raw: true,
+          attributes: [ 'token' ],
+          where: { userId }
+        })
+        .then(res => {
+          // console.log(res)
+          // return the token
+          return res.token
+        })
       }
     },
   Mutation: {
@@ -113,10 +134,10 @@ export default {
             id
           }
       }),
-      storePushNotiToken: (parent, { token, username }, { db }, info) => {
-        // console.log(token, username)
+      storePushNotiToken: (parent, { token, userId }, { db }, info) => {
         return db.models.expo_token.create({ 
-          token
+          token,
+          userId
         })
       }, 
   }
