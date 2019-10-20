@@ -1,5 +1,6 @@
 import Expo from 'expo-server-sdk'
 // import { expo_push_token } from '../database/constant'
+import { ValidationError } from 'apollo-server'
 
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
@@ -51,16 +52,19 @@ export default {
       getPushNotiToken: (parent, { userId },{ db }, info) => {
         // console.log(userId)
         // console.log(typeof userId)
-        
+
         return db.models.expo_token.findOne({
           raw: true,
           attributes: [ 'token' ],
           where: { userId }
         })
         .then(res => {
-          // console.log(res)
           // return the token
           return res.token
+        })
+        .catch(error => {
+          console.log(error)
+          return error
         })
       }
     },
@@ -138,6 +142,14 @@ export default {
         return db.models.expo_token.create({ 
           token,
           userId
+        })
+        .catch(error => {
+          switch(error.name){
+            case 'SequelizeUniqueConstraintError':
+              return "Duplicate Expo Push Token"
+            default:
+              return "Error occured storing expo push notification"
+          }
         })
       }, 
   }
