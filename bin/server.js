@@ -44,7 +44,9 @@ db.sequelize.sync().then(() => {
   //   { email: "email@testtest.com", username:"testGraphQL2", password:"password1222" }
   // ])
 
-  app.listen({ port: 4000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+  // app.listen({ port: 4000 }, () =>
+  app.listen({ port: 80 }, () =>
+    // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+    console.log(`🚀 Server ready at http://localhost:80${server.graphqlPath}`)
   );
 });
