@@ -1,3 +1,3 @@
 export const dbTable = 'sys'
-export const dbUsername = 'root'
-export const dbPassword = 'uEQYaxDn1'
+export const dbUsername = 'admin'
+export const dbPassword = 'password'

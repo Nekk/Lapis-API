@@ -2,7 +2,8 @@ const Sequelize = require('sequelize')
 const constant = require('./constant')
 
 const sequelize = new Sequelize(constant.dbTable, constant.dbUsername, constant.dbPassword, {
-    host: 'localhost',
+    // host: 'localhost',
+    host: 'lapis-aws.cy7n5dci1oim.ap-southeast-1.rds.amazonaws.com',
     port:'3306',
     dialect: 'mysql',
     pool: {
