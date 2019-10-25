@@ -15,8 +15,8 @@ const sequelize = new Sequelize(constant.dbTable, constant.dbUsername, constant.
 });
 let models = {}
 
-models.user = require('../model/user.js')(sequelize, Sequelize)
-models.expo_token = require('../model/expo_token.js')(sequelize, Sequelize)
+models.user = require('../model/user')(sequelize, Sequelize)
+models.expo_token = require('../model/expo_token')(sequelize, Sequelize)
 
 models.expo_token.belongsTo(models.user)
 
