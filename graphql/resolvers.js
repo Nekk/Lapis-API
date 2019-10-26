@@ -7,8 +7,7 @@ const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const saltRounds = 10
 const byteSize = 45
-let expo_push_token;
-
+console.log(12345)
 const requestToken = (payload) => {
     // return crypto.randomBytes(tokenSize).toString('hex')
     const secret = crypto.randomBytes(byteSize).toString('hex')

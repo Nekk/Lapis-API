@@ -7,7 +7,7 @@ import cors from 'cors'
 const express = require('express')
 const { ApolloServer, gql } = require("apollo-server-express");
 const PORT = process.env.PORT || 800
-console.log(process.env)
+
 const server = new ApolloServer({
   typeDefs: gql(typeDefs),
   resolvers,
@@ -46,7 +46,7 @@ db.sequelize.sync().then(() => {
   // ])
 
   // app.listen({ port: 4000 }, () =>
-
+console.log(1)
   const express_server = app.listen({ port: PORT }, () =>
     // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
